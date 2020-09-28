@@ -491,26 +491,27 @@ function detectPoseInRealTime(video, net) {
 
     if (typeof poses !== "undefined" && poses.length > 0) {
       if (typeof poses[0].keypoints[0] != "undefined") {
-        if (poses[0].keypoints[0].score > 0.6) {
-          //console.log(poses[0].keypoints);
+        //the better camera the higher score can be set, to minimize recognition mistakes
+        if (poses[0].keypoints[0].score > 0.7) {
           // 5 left shoulder, 6 right shoulder, 13 left knee, 14 right knee, 15 left ankle, 16 right ankle
+
           //MATH for clothes
           const width =
             poses[0].keypoints[6].position.x - poses[0].keypoints[5].position.x;
           const height =
             poses[0].keypoints[16].position.y -
             poses[0].keypoints[6].position.y;
+
+          //position that image will be displayed
           const positionX = poses[0].keypoints[5].position.x;
           const positionY = poses[0].keypoints[5].position.y;
 
           var e = document.getElementById("selectClothes");
 
           var chosenCloth = e.options[e.selectedIndex].text;
-
+          //countdown();
           drawClothes(image, positionX, positionY, width, height, chosenCloth);
         }
-      } else {
-        console.log("cannot see anything here :(");
       }
     } else {
       drawClothes(image, 200, 200, 700, 700, "outline");
@@ -568,6 +569,10 @@ const drawClothes = (image, positionX, positionY, width, height, name) => {
     drawingWidth,
     drawingHeight
   );
+};
+
+const countdown = () => {
+  //make counter here
 };
 
 /**
