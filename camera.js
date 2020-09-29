@@ -17,7 +17,6 @@
 import * as posenet from "@tensorflow-models/posenet";
 import dat from "dat.gui";
 import Stats from "stats.js";
-import { setPosition, animate } from "./skirt.js";
 
 import {
   drawBoundingBox,
@@ -109,8 +108,8 @@ const guiState = {
   },
   output: {
     showVideo: true,
-    showSkeleton: false,
-    showPoints: false,
+    showSkeleton: true,
+    showPoints: true,
     showBoundingBox: false,
   },
   net: null,
@@ -494,6 +493,15 @@ function detectPoseInRealTime(video, net) {
       if (typeof poses[0].keypoints[0] != "undefined") {
         //the better camera the higher score can be set, to minimize recognition mistakes
         if (poses[0].keypoints[0].score > 0.7) {
+          //If and only if camera and lightning is really great statment above should look like below:
+
+          /*
+           if (poses[0].keypoints[0].score > 0.6 &&
+            poses[0].keypoints[15].score > 0.6 &&
+          poses[0].keypoints[13].score > 0.6)
+          
+          //also confidence score can be set way higher then
+          */
           // 5 left shoulder, 6 right shoulder, 13 left knee, 14 right knee, 15 left ankle, 16 right ankle
 
           //MATH for clothes
@@ -511,23 +519,23 @@ function detectPoseInRealTime(video, net) {
           const hatPositionX = poses[0].keypoints[0].position.x;
           const hatPositionY = poses[0].keypoints[0].position.y;
 
-          var e = document.getElementById("selectClothes");
+          const e = document.getElementById("selectClothes");
 
-          var chosenCloth = e.options[e.selectedIndex].text;
+          const chosenCloth = e.options[e.selectedIndex].text;
           //countdown();
           drawClothes(image, positionX, positionY, width, height, chosenCloth);
+          //draw hat only if nessesary. Change this option adequate to chosen clothing
           if (isHatOn === true) {
             drawHat(hatImage, hatPositionX, hatPositionY);
           }
+        } else {
+          drawClothes(image, 200, 200, 700, 700, "outline");
         }
       }
     } else {
       drawClothes(image, 200, 200, 700, 700, "outline");
     }
 
-    /* */
-
-    // End monitoring code for frames per second
     stats.end();
 
     requestAnimationFrame(poseDetectionFrame);
@@ -586,7 +594,7 @@ const drawHat = (image, positionX, positionY) => {
 //change hat visibility
 let BtnEle = document.querySelector("#hatButton");
 BtnEle.addEventListener("click", () => {
-isHatOn = !isHatOn
+  isHatOn = !isHatOn;
 });
 
 const countdown = () => {
