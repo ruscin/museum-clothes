@@ -35,8 +35,9 @@ let videoHeight = 900;
 const canv = document.getElementById("output");
 const clothesCanvas = canv.getContext("2d");
 const stats = new Stats();
-var image = new Image();
-
+const image = new Image();
+const hatImage = new Image();
+let isHatOn = true;
 /**
  * Loads a the camera to be used in the demo
  *
@@ -108,8 +109,8 @@ const guiState = {
   },
   output: {
     showVideo: true,
-    showSkeleton: true,
-    showPoints: true,
+    showSkeleton: false,
+    showPoints: false,
     showBoundingBox: false,
   },
   net: null,
@@ -506,11 +507,18 @@ function detectPoseInRealTime(video, net) {
           const positionX = poses[0].keypoints[5].position.x;
           const positionY = poses[0].keypoints[5].position.y;
 
+          //positions for hats 0 - nose, becasue there is no head
+          const hatPositionX = poses[0].keypoints[0].position.x;
+          const hatPositionY = poses[0].keypoints[0].position.y;
+
           var e = document.getElementById("selectClothes");
 
           var chosenCloth = e.options[e.selectedIndex].text;
           //countdown();
           drawClothes(image, positionX, positionY, width, height, chosenCloth);
+          if (isHatOn === true) {
+            drawHat(hatImage, hatPositionX, hatPositionY);
+          }
         }
       }
     } else {
@@ -557,7 +565,7 @@ const drawClothes = (image, positionX, positionY, width, height, name) => {
       drawingHeight *= 0.78;
 
       clothesCanvas.font = "40px Arial";
-      clothesCanvas.fillStyle = "red";
+      clothesCanvas.fillStyle = "aqua";
       clothesCanvas.textAlign = "center";
       clothesCanvas.fillText("Ustaw się w wyznaczonym obszarze", 500, 150);
       break;
@@ -570,6 +578,16 @@ const drawClothes = (image, positionX, positionY, width, height, name) => {
     drawingHeight
   );
 };
+
+const drawHat = (image, positionX, positionY) => {
+  hatImage.src = "./images/hat.png";
+  clothesCanvas.drawImage(hatImage, positionX - 35, positionY - 105, 70, 70);
+};
+//change hat visibility
+let BtnEle = document.querySelector("#hatButton");
+BtnEle.addEventListener("click", () => {
+isHatOn = !isHatOn
+});
 
 const countdown = () => {
   //make counter here
